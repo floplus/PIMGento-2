@@ -570,22 +570,41 @@ class Import extends Factory
                 continue;
             }
 
-            $columnPrefix = explode('-', $column);
-            $columnPrefix = reset($columnPrefix);
+            $columnParts = explode('-', $column);
+            $columnPrefix = array_shift($columnParts);
 
-            $values[0][$columnPrefix] = $column;
+            $columnSuffix = join('-', $columnParts);
+
+//            $values[0][$columnPrefix] = $column;
 
             foreach ($stores as $suffix => $affected) {
-                if (preg_match('/' . $suffix . '$/', $column)) {
+                if ($columnSuffix === $suffix || empty($columnSuffix)) {
                     foreach ($affected as $store) {
                         if (!isset($values[$store['store_id']])) {
                             $values[$store['store_id']] = array();
                         }
-                        $values[$store['store_id']][$columnPrefix] = $column;
+                        if (!isset($values[$store['store_id']][$columnPrefix])) {
+                            $values[$store['store_id']][$columnPrefix] = $column;
+                        }
                     }
+
                 }
+//                if (preg_match('/' . $suffix . '$/', $column)) {
+//                    foreach ($affected as $store) {
+//                        if (!isset($values[$store['store_id']])) {
+//                            $values[$store['store_id']] = array();
+//                        }
+//                        if (!isset($values[$store['store_id']][$columnPrefix])) {
+//                            $values[$store['store_id']][$columnPrefix] = $column;
+//                        }
+//                    }
+//                }
             }
 
+            // als backup den admin store setzen, wenn er nicht schon vorher gesetz ist
+            if (!isset($values[0][$columnPrefix])) {
+                $values[0][$columnPrefix] = $column;
+            }
         }
 
         foreach($values as $storeId => $data) {
