@@ -575,33 +575,22 @@ class Import extends Factory
 
             $columnSuffix = join('-', $columnParts);
 
-//            $values[0][$columnPrefix] = $column;
-
             foreach ($stores as $suffix => $affected) {
                 if ($columnSuffix === $suffix || empty($columnSuffix)) {
                     foreach ($affected as $store) {
                         if (!isset($values[$store['store_id']])) {
                             $values[$store['store_id']] = array();
                         }
+                        // first matched value wins
                         if (!isset($values[$store['store_id']][$columnPrefix])) {
                             $values[$store['store_id']][$columnPrefix] = $column;
                         }
                     }
 
                 }
-//                if (preg_match('/' . $suffix . '$/', $column)) {
-//                    foreach ($affected as $store) {
-//                        if (!isset($values[$store['store_id']])) {
-//                            $values[$store['store_id']] = array();
-//                        }
-//                        if (!isset($values[$store['store_id']][$columnPrefix])) {
-//                            $values[$store['store_id']][$columnPrefix] = $column;
-//                        }
-//                    }
-//                }
             }
 
-            // als backup den admin store setzen, wenn er nicht schon vorher gesetz ist
+            // backup for admin store, if it isn't already set, last column wins
             if (!isset($values[0][$columnPrefix])) {
                 $values[0][$columnPrefix] = $column;
             }
